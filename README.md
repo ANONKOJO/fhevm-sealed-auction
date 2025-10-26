@@ -1,4 +1,4 @@
-# 🔐 FHEVM Sealed-Bid Auction
+# FHEVM Sealed-Bid Auction
 
 A fully private sealed-bid auction platform built with **Zama's FHEVM** (Fully Homomorphic Encryption Virtual Machine). All bid amounts are encrypted using `euint64` and computed homomorphically on-chain.
 
@@ -7,11 +7,11 @@ A fully private sealed-bid auction platform built with **Zama's FHEVM** (Fully H
 ![Network](https://img.shields.io/badge/network-Sepolia-purple.svg)
 ![FHEVM](https://img.shields.io/badge/FHEVM-Zama-yellow.svg)
 
-**🏆 Built for the Zama Developer Program**
+**Built for the Zama Developer Program**
 
 ---
 
-## 🌟 **Live Deployment**
+## **Live Deployment**
 
 - **Contract Address:** `0x623e2A23950FcEc7E0D4f0653555301Daa04F8E9`
 - **Network:** Sepolia Testnet
@@ -19,7 +19,7 @@ A fully private sealed-bid auction platform built with **Zama's FHEVM** (Fully H
 
 ---
 
-## 🎯 **The Problem**
+## **The Problem**
 
 Traditional on-chain auctions are fundamentally broken:
 
@@ -32,7 +32,7 @@ Traditional on-chain auctions are fundamentally broken:
 
 ---
 
-## 💡 **Our Solution**
+## **Our Solution**
 
 **FHEVM Sealed-Bid Auction** uses Zama's Fully Homomorphic Encryption to enable:
 
@@ -44,7 +44,7 @@ Traditional on-chain auctions are fundamentally broken:
 
 ---
 
-## 🏗️ **Architecture**
+## **Architecture**
 
 ### **Smart Contract Layer**
 ```
@@ -104,7 +104,7 @@ SealedBidAuction.sol (FHEVM-powered)
 
 ---
 
-## 🔐 **Why FHEVM?**
+## **Why FHEVM?**
 
 ### **Comparison with Other Privacy Solutions**
 
@@ -120,7 +120,7 @@ SealedBidAuction.sol (FHEVM-powered)
 
 ---
 
-## 🚀 **Getting Started**
+## **Getting Started**
 
 ### **Prerequisites**
 - Node.js v18+
@@ -215,19 +215,19 @@ function getAuction(uint256 _auctionId)
 
 ---
 
-## 🎨 **Frontend Features**
+## **Frontend Features**
 
-- 🏠 **Landing Page** - Hero section with features
-- 🔍 **Browse Auctions** - Filter by active/ended
-- ➕ **Create Auction** - Simple form with preview
-- 🎯 **Auction Detail** - Full bid interface
-- 🔐 **Wallet Integration** - Connect/disconnect MetaMask
-- 📱 **Responsive Design** - Mobile-friendly UI
-- 🎨 **Zama Theme** - Yellow/purple brand colors
+- **Landing Page** - Hero section with features
+- **Browse Auctions** - Filter by active/ended
+- **Create Auction** - Simple form with preview
+- **Auction Detail** - Full bid interface
+- **Wallet Integration** - Connect/disconnect MetaMask
+- **Responsive Design** - Mobile-friendly UI
+- **Zama Theme** - Yellow/purple brand colors
 
 ---
 
-## 🛠️ **Tech Stack**
+## **Tech Stack**
 
 | Layer | Technology |
 |-------|-----------|
@@ -241,7 +241,7 @@ function getAuction(uint256 _auctionId)
 
 ---
 
-## 🔒 **Security Features**
+## **Security Features**
 
 ✅ **Encrypted Storage** - All bids stored as euint64  
 ✅ **Access Control** - Only bidder can see their own encrypted bid  
@@ -252,7 +252,7 @@ function getAuction(uint256 _auctionId)
 
 ---
 
-## 📈 **Gas Costs**
+## **Gas Costs**
 
 | Operation | Gas Cost (est.) |
 |-----------|-----------------|
@@ -264,7 +264,7 @@ function getAuction(uint256 _auctionId)
 
 ---
 
-## 🗺️ **Roadmap**
+## **Roadmap**
 
 ### **✅ Phase 1: MVP (COMPLETE)**
 - [x] FHEVM contract with euint64
@@ -287,7 +287,7 @@ function getAuction(uint256 _auctionId)
 
 ---
 
-## 🏆 **Zama Developer Program**
+## **Zama Developer Program**
 
 This project was built for the Zama Developer Program.
 
@@ -303,11 +303,11 @@ This project was built for the Zama Developer Program.
 | **Development Effort** | 10% | Full-stack FHEVM implementation |
 | **Business Potential** | 10% | Real use cases: NFTs, RWA, carbon credits |
 
-**Total: 100%** 🎯
+**Total: 100%** 
 
 ---
 
-## 📚 **Learn More**
+## **Learn More**
 
 - [Zama Documentation](https://docs.zama.ai)
 - [FHEVM Whitepaper](https://github.com/zama-ai/fhevm/blob/main/fhevm-whitepaper.pdf)
@@ -315,7 +315,7 @@ This project was built for the Zama Developer Program.
 
 ---
 
-## 🤝 **Contributing**
+## **Contributing**
 
 Contributions welcome! Please:
 
@@ -332,15 +332,15 @@ MIT License - See [LICENSE](LICENSE) file
 
 ---
 
-## 👨‍💻 **Author**
+## **Author**
 
-**Eric Kojo Donkor**
+**Kojo**
 
 Built with ❤️ for the Zama Developer Program
 
 ---
 
-## 🙏 **Acknowledgments**
+## **Acknowledgments**
 
 - **Zama Team** for FHEVM technology
 - **Ethereum Foundation** for Sepolia testnet
@@ -348,6 +348,6 @@ Built with ❤️ for the Zama Developer Program
 
 ---
 
-**🔐 Making blockchain auctions truly private and fair.**
+**Making blockchain auctions truly private and fair.**
 
 *Powered by Zama FHEVM*
