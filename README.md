@@ -227,6 +227,30 @@ function getAuction(uint256 _auctionId)
 
 ---
 
+## 📸 Screenshots
+
+### Homepage
+![Homepage](./frontend/public/screenshots/homepage.png)
+*Landing page showcasing the FHEVM sealed-bid auction platform*
+
+### Browse Auctions
+![Browse Auctions](./frontend/public/screenshots/browse-auctions.png)
+*View all active and completed auctions with encrypted bid counts*
+
+### Auction Details
+![Auction Detail](./frontend/public/screenshots/auction-detail.png)
+*Detailed view showing encrypted bids (euint64) and time remaining*
+
+### Create Auction
+![Create Auction](./frontend/public/screenshots/create-auction.png)
+*Simple form to create new sealed-bid auctions*
+
+---
+
+
+
+---
+
 ## **Tech Stack**
 
 | Layer | Technology |
