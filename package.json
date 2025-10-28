@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@fhevm/solidity": "^0.8.0",
-    "@zama-fhe/oracle-solidity": "^0.2.0"
+    "@zama-fhe/oracle-solidity": "^0.2.0",
+    "http-proxy-middleware": "^3.0.5"
   }
 }

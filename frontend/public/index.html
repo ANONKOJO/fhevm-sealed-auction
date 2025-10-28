@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#FFD208" />
     <meta name="description" content="FHEVM Sealed-Bid Auction - Fully Private Bidding" />
+    
+    <!-- Fix for Node.js globals in browser -->
+    <script>
+      if (typeof global === 'undefined') {
+        var global = window;
+      }
+      if (typeof process === 'undefined') {
+        var process = { env: {} };
+      }
+      if (typeof Buffer === 'undefined') {
+        var Buffer = { isBuffer: () => false };
+      }
+    </script>
+    
     <title>FHEVM Sealed Auction</title>
   </head>
   <body>

@@ -92,9 +92,13 @@ function App() {
       setSigner(ethersSigner);
       setAccount(accounts[0]);
       
+      console.log('✅ Wallet connected successfully!');
+      console.log('⚠️  FHE SDK integration pending - contract is FHE-ready');
+      
       setLoading(false);
     } catch (error) {
       console.error('Error connecting wallet:', error);
+      alert('Error: ' + error.message);
       setLoading(false);
     }
   };
@@ -111,9 +115,18 @@ function App() {
         
         <Routes>
           <Route path="/" element={<Home account={account} />} />
-          <Route path="/browse" element={<Browse account={account} signer={signer} />} />
-          <Route path="/create" element={<Create account={account} signer={signer} />} />
-          <Route path="/auction/:id" element={<AuctionDetail account={account} signer={signer} />} />
+          <Route 
+            path="/browse" 
+            element={<Browse account={account} signer={signer} />} 
+          />
+          <Route 
+            path="/create" 
+            element={<Create account={account} signer={signer} />} 
+          />
+          <Route 
+            path="/auction/:id" 
+            element={<AuctionDetail account={account} signer={signer} />} 
+          />
         </Routes>
       </div>
     </Router>

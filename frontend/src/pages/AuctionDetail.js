@@ -7,6 +7,11 @@ import './AuctionDetail.css';
 
 const AuctionDetail = ({ account, signer, fhevmInstance }) => {
   const { id } = useParams();
+  useEffect(() => {
+  console.log('AuctionDetail - fhevmInstance:', fhevmInstance);
+  console.log('AuctionDetail - account:', account);
+  console.log('AuctionDetail - signer:', signer);
+}, [fhevmInstance, account, signer]);
   const [auction, setAuction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showBidModal, setShowBidModal] = useState(false);
@@ -67,62 +72,69 @@ const AuctionDetail = ({ account, signer, fhevmInstance }) => {
   };
 
 const handlePlaceBid = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!account || !signer) {
-      alert('Please connect your wallet');
-      return;
-    }
+  if (!account || !signer) {
+    alert('Please connect your wallet');
+    return;
+  }
 
-    if (!bidAmount) {
-      alert('Please enter bid amount');
-      return;
-    }
+  if (!fhevmInstance) {
+    alert('FHE instance not initialized. Please refresh and reconnect your wallet.');
+    return;
+  }
 
-    if (parseFloat(bidAmount) < parseFloat(auction.minBid)) {
-      alert(`Bid must be at least ${auction.minBid} ETH`);
-      return;
-    }
+  if (!bidAmount) {
+    alert('Please enter bid amount');
+    return;
+  }
 
-    try {
-      setSubmitting(true);
-      
-      alert('⚠️ Note: This demo uses a simplified bid submission.\n\nIn production, bids would be encrypted client-side using the FHEVM SDK before submission.\n\nThe smart contract is already FHEVM-ready and deployed!');
-      
-      // For demo: we'll just send a placeholder
-      // In production: const encryptedBid = fhevmInstance.encrypt64(bidWei);
-      
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      
-      // Simulated encrypted bid (in production this would be real FHE encryption)
-      const bidWei = ethers.parseEther(bidAmount);
-console.log('Bid amount:', ethers.formatEther(bidWei), 'ETH');
-const mockEncryptedData = ethers.randomBytes(32);
-      const mockProof = ethers.randomBytes(32);
+  if (parseFloat(bidAmount) < parseFloat(auction.minBid)) {
+    alert(`Bid must be at least ${auction.minBid} ETH`);
+    return;
+  }
 
-      console.log('Placing bid (demo mode)...');
-      
-      const tx = await contract.placeBid(
-        id,
-        mockEncryptedData,
-        mockProof
-      );
-      
-      console.log('Transaction sent:', tx.hash);
-      await tx.wait();
-      console.log('Bid placed!');
+  try {
+    setSubmitting(true);
+    
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    
+    // Convert ETH to Wei
+    const bidWei = ethers.parseEther(bidAmount);
+    const bidValue = Number(bidWei);
+    
+    console.log('Bid amount:', bidAmount, 'ETH');
+    console.log('Bid amount in Wei:', bidValue);
+    
+    // Encrypt using fhevmjs
+    console.log('Encrypting bid with fhevmjs...');
+    const encryptedBid = await fhevmInstance.encrypt64(bidValue);
+    
+    console.log('Encrypted data:', encryptedBid);
+    console.log('Submitting encrypted bid to contract...');
+    
+    // Place the bid with encrypted data and proof
+    const tx = await contract.placeBid(
+      id,
+      encryptedBid.handles[0],  // The encrypted euint64 handle
+      encryptedBid.inputProof    // The cryptographic proof
+    );
+    
+    console.log('Transaction sent:', tx.hash);
+    await tx.wait();
+    console.log('Bid placed successfully!');
 
-      alert('✅ Bid submitted!\n\n(Demo mode - production would encrypt with FHEVM SDK)');
-      setShowBidModal(false);
-      setBidAmount('');
-      loadAuction();
-    } catch (error) {
-      console.error('Error placing bid:', error);
-      alert('Note: The contract expects real FHEVM encryption.\n\nThis demo shows the frontend flow. See deployed contract for full FHEVM implementation.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    alert('✅ Encrypted bid submitted successfully!');
+    setShowBidModal(false);
+    setBidAmount('');
+    loadAuction();
+  } catch (error) {
+    console.error('Error placing bid:', error);
+    alert('Failed to place bid: ' + error.message);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const handleRevealWinner = async () => {
     if (!account || !signer) {
