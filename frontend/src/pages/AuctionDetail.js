@@ -3,15 +3,19 @@ import { useParams, Link } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { Clock, Lock, ArrowLeft, AlertCircle } from 'lucide-react';
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../utils/constants';
+import { createEncryptedInput } from '../lib/fhevm';
 import './AuctionDetail.css';
 
-const AuctionDetail = ({ account, signer, fhevmInstance }) => {
+const AuctionDetail = ({ account, signer, fhevmInstance, fhevmStatus }) => {
   const { id } = useParams();
+  
   useEffect(() => {
-  console.log('AuctionDetail - fhevmInstance:', fhevmInstance);
-  console.log('AuctionDetail - account:', account);
-  console.log('AuctionDetail - signer:', signer);
-}, [fhevmInstance, account, signer]);
+    console.log('AuctionDetail - fhevmInstance:', fhevmInstance);
+    console.log('AuctionDetail - fhevmStatus:', fhevmStatus);
+    console.log('AuctionDetail - account:', account);
+    console.log('AuctionDetail - signer:', signer);
+  }, [fhevmInstance, fhevmStatus, account, signer]);
+  
   const [auction, setAuction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showBidModal, setShowBidModal] = useState(false);
@@ -71,70 +75,74 @@ const AuctionDetail = ({ account, signer, fhevmInstance }) => {
     return `${minutes}m`;
   };
 
-const handlePlaceBid = async (e) => {
-  e.preventDefault();
+  const handlePlaceBid = async (e) => {
+    e.preventDefault();
 
-  if (!account || !signer) {
-    alert('Please connect your wallet');
-    return;
-  }
+    if (!account || !signer) {
+      alert('Please connect your wallet');
+      return;
+    }
 
-  if (!fhevmInstance) {
-    alert('FHE instance not initialized. Please refresh and reconnect your wallet.');
-    return;
-  }
+    if (!fhevmInstance || fhevmStatus !== 'ready') {
+      alert('FHEVM not ready. Please refresh and reconnect your wallet.');
+      return;
+    }
 
-  if (!bidAmount) {
-    alert('Please enter bid amount');
-    return;
-  }
+    if (!bidAmount) {
+      alert('Please enter bid amount');
+      return;
+    }
 
-  if (parseFloat(bidAmount) < parseFloat(auction.minBid)) {
-    alert(`Bid must be at least ${auction.minBid} ETH`);
-    return;
-  }
+    if (parseFloat(bidAmount) < parseFloat(auction.minBid)) {
+      alert(`Bid must be at least ${auction.minBid} ETH`);
+      return;
+    }
 
-  try {
-    setSubmitting(true);
-    
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-    
-    // Convert ETH to Wei
-    const bidWei = ethers.parseEther(bidAmount);
-    const bidValue = Number(bidWei);
-    
-    console.log('Bid amount:', bidAmount, 'ETH');
-    console.log('Bid amount in Wei:', bidValue);
-    
-    // Encrypt using fhevmjs
-    console.log('Encrypting bid with fhevmjs...');
-    const encryptedBid = await fhevmInstance.encrypt64(bidValue);
-    
-    console.log('Encrypted data:', encryptedBid);
-    console.log('Submitting encrypted bid to contract...');
-    
-    // Place the bid with encrypted data and proof
-    const tx = await contract.placeBid(
-      id,
-      encryptedBid.handles[0],  // The encrypted euint64 handle
-      encryptedBid.inputProof    // The cryptographic proof
-    );
-    
-    console.log('Transaction sent:', tx.hash);
-    await tx.wait();
-    console.log('Bid placed successfully!');
+    try {
+      setSubmitting(true);
+      
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      
+      // Convert ETH to Wei
+      const bidWei = ethers.parseEther(bidAmount);
+      const bidValue = Number(bidWei);
+      
+      console.log('Bid amount:', bidAmount, 'ETH');
+      console.log('Bid amount in Wei:', bidValue);
+      
+      // ✅ Encrypt using the working CDN-based SDK
+      console.log('Encrypting bid with FHEVM...');
+      const encryptedBid = await createEncryptedInput(CONTRACT_ADDRESS, account, bidValue);
+      
+      console.log('Encrypted bid:', encryptedBid);
+      console.log('Handle type:', typeof encryptedBid.handles[0]);
+      console.log('Handle value:', encryptedBid.handles[0]);
+      console.log('Proof type:', typeof encryptedBid.inputProof);
+      console.log('Proof length:', encryptedBid.inputProof.length);
+      console.log('Submitting encrypted bid to contract...');
+      
+      // Place the bid with encrypted data and proof
+      const tx = await contract.placeBid(
+        id,
+        encryptedBid.handles[0],  // The encrypted euint64 handle
+        encryptedBid.inputProof    // The cryptographic proof
+      );
+      
+      console.log('Transaction sent:', tx.hash);
+      await tx.wait();
+      console.log('Bid placed successfully!');
 
-    alert('✅ Encrypted bid submitted successfully!');
-    setShowBidModal(false);
-    setBidAmount('');
-    loadAuction();
-  } catch (error) {
-    console.error('Error placing bid:', error);
-    alert('Failed to place bid: ' + error.message);
-  } finally {
-    setSubmitting(false);
-  }
-};
+      alert('✅ Encrypted bid submitted successfully!');
+      setShowBidModal(false);
+      setBidAmount('');
+      loadAuction();
+    } catch (error) {
+      console.error('Error placing bid:', error);
+      alert('Failed to place bid: ' + error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleRevealWinner = async () => {
     if (!account || !signer) {
@@ -264,13 +272,13 @@ const handlePlaceBid = async (e) => {
               </div>
 
               {auction.isActive ? (
-               <button 
-  onClick={() => setShowBidModal(true)}
-  className="btn btn-primary btn-large"
-  disabled={!account}
->
-  {!account ? 'Connect Wallet to Bid' : 'Place Bid (Demo)'}
-</button>
+                <button 
+                  onClick={() => setShowBidModal(true)}
+                  className="btn btn-primary btn-large"
+                  disabled={!account || fhevmStatus !== 'ready'}
+                >
+                  {!account ? 'Connect Wallet to Bid' : fhevmStatus !== 'ready' ? 'Initializing FHE...' : 'Place Encrypted Bid'}
+                </button>
               ) : (
                 <>
                   {!auction.finalized && auction.totalBids > 0 && (

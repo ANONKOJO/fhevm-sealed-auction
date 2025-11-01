@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ethers } from 'ethers';
+import { initializeFheInstance } from './lib/fhevm';
 
 import Home from './pages/Home';
 import Browse from './pages/Browse';
@@ -13,7 +14,9 @@ import './App.css';
 function App() {
   const [account, setAccount] = useState(null);
   const [signer, setSigner] = useState(null);
+  const [fhevmInstance, setFhevmInstance] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fhevmStatus, setFhevmStatus] = useState('idle'); // 'idle' | 'loading' | 'ready' | 'error'
 
   useEffect(() => {
     checkConnection();
@@ -48,6 +51,8 @@ function App() {
     if (accounts.length === 0) {
       setAccount(null);
       setSigner(null);
+      setFhevmInstance(null);
+      setFhevmStatus('idle');
     } else {
       connectWallet();
     }
@@ -56,6 +61,8 @@ function App() {
   const disconnectWallet = () => {
     setAccount(null);
     setSigner(null);
+    setFhevmInstance(null);
+    setFhevmStatus('idle');
     alert('Wallet disconnected from app');
   };
 
@@ -91,9 +98,21 @@ function App() {
 
       setSigner(ethersSigner);
       setAccount(accounts[0]);
+
+      // Initialize FHEVM using the working CDN-based SDK
+      console.log('🔐 Initializing FHEVM from CDN...');
+      setFhevmStatus('loading');
       
-      console.log('✅ Wallet connected successfully!');
-      console.log('⚠️  FHE SDK integration pending - contract is FHE-ready');
+      try {
+        const instance = await initializeFheInstance();
+        setFhevmInstance(instance);
+        setFhevmStatus('ready');
+        console.log('✅ FHEVM initialized successfully!');
+      } catch (fheError) {
+        console.error('FHEVM initialization failed:', fheError);
+        setFhevmStatus('error');
+        alert('FHEVM initialization failed. Please refresh the page and try again.');
+      }
       
       setLoading(false);
     } catch (error) {
@@ -117,15 +136,15 @@ function App() {
           <Route path="/" element={<Home account={account} />} />
           <Route 
             path="/browse" 
-            element={<Browse account={account} signer={signer} />} 
+            element={<Browse account={account} signer={signer} fhevmInstance={fhevmInstance} fhevmStatus={fhevmStatus} />} 
           />
           <Route 
             path="/create" 
-            element={<Create account={account} signer={signer} />} 
+            element={<Create account={account} signer={signer} fhevmInstance={fhevmInstance} fhevmStatus={fhevmStatus} />} 
           />
           <Route 
             path="/auction/:id" 
-            element={<AuctionDetail account={account} signer={signer} />} 
+            element={<AuctionDetail account={account} signer={signer} fhevmInstance={fhevmInstance} fhevmStatus={fhevmStatus} />} 
           />
         </Routes>
       </div>
